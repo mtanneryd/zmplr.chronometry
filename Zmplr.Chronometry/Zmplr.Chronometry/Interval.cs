@@ -1,7 +1,7 @@
 /*
- * Copyright ©  2017-2019 TÂnneryd IT AB
+ * Copyright ù  2017-2019 Tùnneryd IT AB
  * 
- * This file is part of the nuget package Tanneryd.Chronometry.
+ * This file is part of the nuget package Zmplr.Chronometry.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Tanneryd.Chronometry
+namespace Zmplr.Chronometry
 {
     public class Interval
     {

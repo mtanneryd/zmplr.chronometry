@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<RootNamespace>Tanneryd</RootNamespace>
+		<RootNamespace>Zmplr.Chronometry</RootNamespace>
 		<Authors>Tånneryd IT AB</Authors>
 		<Copyright>Tånneryd IT AB</Copyright>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>

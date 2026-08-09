@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Tanneryd.Chronometry.Tests
+namespace Zmplr.Chronometry.Tests
 {
     [TestClass]
     public class DateTimeExtensionsFixture

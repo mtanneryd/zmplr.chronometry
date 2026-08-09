@@ -1,7 +1,7 @@
 ﻿/*
  * Copyright ©  2017-2019 Tånneryd IT AB
  * 
- * This file is part of the nuget package Tanneryd.Chronometry.
+ * This file is part of the nuget package Zmplr.Chronometry.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Tanneryd.Chronometry
+namespace Zmplr.Chronometry
 {
     public static class DateTimeExtensions
     {
@@ -396,8 +396,7 @@ namespace Tanneryd.Chronometry
             if (count < 1) throw new ArgumentException("count must be > 0");
 
             var interval = new Interval { Start = self.AddDays(-7 * count), Stop = self.AddDays(-1) };
-            var next = interval.FilterOnDayOfWeek(dayOfWeek)
-                .Reverse()
+            var next = Enumerable.Reverse(interval.FilterOnDayOfWeek(dayOfWeek))
                 .Skip(count - 1)
                 .First();
 

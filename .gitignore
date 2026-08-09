@@ -3,10 +3,10 @@
 ################################################################################
 
 /.vs
-/Tanneryd.Chronometry/.vs/Tanneryd.Chronometry
-/Tanneryd.Chronometry/packages
-/Tanneryd.Chronometry/Tanneryd.Chronometry/bin
-/Tanneryd.Chronometry/Tanneryd.Chronometry/obj
-/Tanneryd.Chronometry/Tanneryd.Chronometry.Tests/bin
-/Tanneryd.Chronometry/Tanneryd.Chronometry.Tests/obj
-/Tanneryd.Chronometry/Tanneryd.Chronometry/nuget_api_key.txt
+/Zmplr.Chronometry/.vs/Zmplr.Chronometry
+/Zmplr.Chronometry/packages
+/Zmplr.Chronometry/Zmplr.Chronometry/bin
+/Zmplr.Chronometry/Zmplr.Chronometry/obj
+/Zmplr.Chronometry/Zmplr.Chronometry.Tests/bin
+/Zmplr.Chronometry/Zmplr.Chronometry.Tests/obj
+/Zmplr.Chronometry/Zmplr.Chronometry/nuget_api_key.txt
