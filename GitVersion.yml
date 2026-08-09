@@ -1,0 +1,134 @@
+# GitVersion.yml – 100% Compatible with GitVersion.MsBuild 6.5.1 (Dec 2025)
+#
+# VERSIONING OVERVIEW
+# ===================
+# Version format: {Year}.{Minor}.{Patch}  e.g. 2026.7.3
+#
+# BRANCH VERSIONING BEHAVIOUR
+# ----------------------------
+#
+# master / main
+#   Produces clean, stable release versions with no pre-release tag.
+#   Example: 2026.7.0, 2026.7.1
+#   Each commit/merge increments the Patch number (ContinuousDelivery mode).
+#   Tag a commit on master to pin a release version (e.g. git tag 2026.7.0).
+#
+# release/x.y.z  (branched from develop or master)
+#   Produces release-candidate versions tagged with 'rc'.
+#   Example: 2026.7.0-rc.1, 2026.7.0-rc.2
+#   Patch increments on each commit. Branch name drives the base version
+#   (e.g. release/2026.7.0 → 2026.7.0-rc.N). Merge to master when ready.
+#   Once a release branch exists, develop will automatically track past it
+#   and bump to the next Minor version (see develop below).
+#
+# develop
+#   Produces beta pre-release versions tagged with 'beta'.
+#   Example: 2026.8.0-beta.20260624.31232
+#   Minor increments each time a new release/* branch is created (via
+#   TrackReleaseBranches strategy): develop always versions one Minor ahead
+#   of the highest existing release branch.
+#   PRE-RELEASE NUMBER: NOT GitVersion's CommitsSinceVersionSource. That count is
+#   relative to the nearest "version source", so tagging a release on master inserts
+#   a newer version source into develop's ancestry and LOWERS the count (e.g.
+#   beta.67 -> beta.60), which breaks NuGet ordering. Instead Directory.Build.props
+#   (_SetMonotonicPreReleaseVersion target) rewrites the pre-release number from the
+#   commit timestamp as two numeric SemVer identifiers, '{yyyyMMdd}.{secondsIntoDay}',
+#   which is strictly monotonic and Int32-safe for NuGet comparison.
+#
+# hotfix/x.y.z  (branched from master)
+#   Produces clean patch versions (no pre-release tag), same as master.
+#   Example: 2026.7.1
+#   Tracks release branches so it stays aligned with the current release line.
+#   Merge back to both master and develop when complete.
+#
+# feature/*  (branched from develop)
+#   Produces alpha pre-release versions tagged with 'alpha'.
+#   Example: 2026.8.0-alpha.20260624.31232
+#   Inherits the increment strategy from develop (Minor).
+#   Uses the same monotonic timestamp pre-release number as develop (see above).
+#   Merge back to develop when complete.
+#
+# ASSEMBLY VERSION FORMATS
+# ------------------------
+#   AssemblyVersion:         {Major}.{Minor}.{Patch}.0          (e.g. 2026.7.0.0)
+#   AssemblyFileVersion:     {Major}.{Minor}.{Patch}.{commits}  (e.g. 2026.7.0.72)
+#   AssemblyInformationalVersion: full SemVer string            (e.g. 2026.8.0-beta.72)
+
+mode: ContinuousDeployment
+
+# TrackReleaseBranches: allows develop to detect existing release/* branches
+# and increment Minor past them. Must be listed here to be active.
+strategies:
+  - Fallback
+  - ConfiguredNextVersion
+  - MergeMessage
+  - TaggedCommit
+  - TrackReleaseBranches
+  - VersionInBranchName
+
+next-version: 2026.0.0
+increment: Patch
+
+# Emit the HEAD commit timestamp (UTC) down to the second. Directory.Build.props uses
+# this to build a monotonic pre-release number for develop/feature builds; see the
+# _SetMonotonicPreReleaseVersion target. Default is date-only ('yyyy-MM-dd').
+commit-date-format: 'yyyyMMddHHmmss'
+
+# Version formatting (required for your custom Assembly/Package versions)
+assembly-versioning-format: '{Major}.{Minor}.{Patch}.0'
+assembly-file-versioning-format: '{Major}.{Minor}.{Patch}.{CommitsSinceVersionSource}'
+assembly-informational-format: '{FullSemVer}'
+
+# Branch configuration (v6: regex required; label for pre-release tags)
+branches:
+  master:
+    regex: ^master$|^main$
+    mode: ContinuousDelivery
+    label: ''
+    increment: Patch
+
+  hotfix:
+    regex: ^hotfix(es)?/
+    mode: ContinuousDelivery
+    label: ''
+    increment: Patch
+    tracks-release-branches: true
+
+  develop:
+    regex: ^develop$
+    label: beta
+    increment: Minor
+    tracks-release-branches: true
+    prevent-increment:
+      of-merged-branch: false
+      when-branch-merged: false
+    source-branches:
+      - master
+
+  release:
+    regex: ^release(s)?/
+    mode: ContinuousDelivery
+    label: rc
+    increment: Patch
+    is-release-branch: true
+    tracks-release-branches: false
+    source-branches:
+      - develop
+      - master
+
+  feature:
+    regex: ^feature(s)?/
+    mode: ContinuousDelivery
+    label: alpha
+    increment: Inherit
+    tracks-release-branches: false
+    source-branches:
+      - develop
+
+# Force next MAJOR to 2026.0.0 via commit/merge message
+major-version-bump-message: '\+major|\bbump\s+major\b'
+
+ignore:
+  sha: []
+
+merge-message-formats: {}

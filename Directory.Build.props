@@ -1,0 +1,81 @@
+<Project>
+  <!-- GitVersion.MsBuild 6.x creates these files in the repo root -->
+  <Import Project="GitVersion.MsBuild.props" Condition="Exists('GitVersion.MsBuild.props')" />
+  <Import Project="GitVersion.MsBuild.targets" Condition="Exists('GitVersion.MsBuild.targets')" />
+
+  <PropertyGroup>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+
+    <!-- Disable all code generation to preserve SourceLink -->
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UpdateAssemblyInfo>false</UpdateAssemblyInfo>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+    <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    
+    <!-- Enable GitVersion to update MSBuild properties -->
+    <GitVersionUpdateVersionProperties>true</GitVersionUpdateVersionProperties>
+    <SourceLinkNormalizeLineEndings>true</SourceLinkNormalizeLineEndings>
+  </PropertyGroup>
+
+  <!-- Set version properties after GitVersion has run -->
+  <!-- These MSBuild properties are automatically embedded into DLL metadata without code generation -->
+  <PropertyGroup Condition="'$(GitVersion_AssemblySemVer)' != ''">
+    <AssemblyVersion>$(GitVersion_AssemblySemVer)</AssemblyVersion>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(GitVersion_AssemblySemFileVer)' != ''">
+    <FileVersion>$(GitVersion_AssemblySemFileVer)</FileVersion>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(GitVersion_InformationalVersion)' != ''">
+    <InformationalVersion>$(GitVersion_InformationalVersion)</InformationalVersion>
+  </PropertyGroup>
+
+  <!--
+    Monotonic pre-release versioning for develop (beta) and feature (alpha) builds.
+
+    PROBLEM: GitVersion's default pre-release number is CommitsSinceVersionSource, the
+    number of commits between HEAD and the nearest "version source" (tag). When a release
+    is tagged on master, that tag enters develop's ancestry as a newer version source, so
+    the count DROPS (e.g. 2026.8.0-beta.67 -> 2026.8.0-beta.60). On NuGet that makes the
+    older package outrank the newer one.
+
+    FIX: derive the pre-release number from the HEAD commit timestamp (UTC) instead. It is
+    split into two dot-separated SemVer-2.0 numeric identifiers so each stays within Int32 -
+    NuGet compares numeric pre-release identifiers with Int32.TryParse and silently falls
+    back to string comparison if a value overflows:
+
+        {MajorMinorPatch}-{label}.{yyyyMMdd}.{secondsIntoDay}
+        e.g. 2026.8.0-beta.20260624.31232
+
+    This is strictly increasing over time, identical for every project in a single build
+    (it is based on the commit, not wall-clock time), and every new value sorts ABOVE the
+    previously published beta.NN numbers. Requires GitVersion.yml:
+    'commit-date-format: yyyyMMddHHmmss' so GitVersion_CommitDate carries the time.
+
+    Runs AfterTargets="GetVersion" (GitVersion's target) so it overrides Version /
+    PackageVersion before they are consumed by compile and pack. AssemblyVersion and
+    FileVersion are left as GitVersion computed them. The condition makes this a no-op for
+    master/release/hotfix (no pre-release label) and when GitVersion did not run.
+  -->
+  <Target Name="_SetMonotonicPreReleaseVersion"
+          AfterTargets="GetVersion"
+          Condition="('$(GitVersion_PreReleaseLabel)' == 'beta' Or '$(GitVersion_PreReleaseLabel)' == 'alpha') And '$(GitVersion_CommitDate)' != '' And $(GitVersion_CommitDate.Length) == 14">
+    <PropertyGroup>
+      <!-- Split into intermediate properties first: MSBuild only evaluates a property's
+           string method (Substring) when it is referenced as a plain $(prop), not when
+           nested directly inside a static-method argument. -->
+      <_McDate>$(GitVersion_CommitDate.Substring(0, 8))</_McDate>
+      <_McHH>$(GitVersion_CommitDate.Substring(8, 2))</_McHH>
+      <_McMM>$(GitVersion_CommitDate.Substring(10, 2))</_McMM>
+      <_McSS>$(GitVersion_CommitDate.Substring(12, 2))</_McSS>
+      <_McSecondsIntoDay>$([System.Convert]::ToInt32($([MSBuild]::Add($([MSBuild]::Add($([MSBuild]::Multiply($([System.Int32]::Parse($(_McHH))), 3600)), $([MSBuild]::Multiply($([System.Int32]::Parse($(_McMM))), 60)))), $([System.Int32]::Parse($(_McSS)))))))</_McSecondsIntoDay>
+      <Version>$(GitVersion_MajorMinorPatch)-$(GitVersion_PreReleaseLabel).$(_McDate).$(_McSecondsIntoDay)</Version>
+      <PackageVersion>$(Version)</PackageVersion>
+      <InformationalVersion>$(Version)</InformationalVersion>
+    </PropertyGroup>
+    <Message Importance="high" Text="Monotonic pre-release version: $(Version) (commit $(GitVersion_ShortSha))" />
+  </Target>
+</Project>

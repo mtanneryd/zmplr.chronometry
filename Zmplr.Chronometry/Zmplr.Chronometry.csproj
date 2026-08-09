@@ -4,21 +4,29 @@
 		<RootNamespace>Zmplr.Chronometry</RootNamespace>
 		<Authors>Tånneryd IT AB</Authors>
 		<Copyright>Tånneryd IT AB</Copyright>
+		<Description>DateTime extensions and other time related helper classes.</Description>
+		<PackageTags>datetime;time;calendar;interval;extensions</PackageTags>
+		<PackageProjectUrl>https://github.com/mtanneryd/zmplr.chronometry</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/mtanneryd/zmplr.chronometry</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<TargetFrameworks>net8.0;net48;netstandard2.0;netstandard2.1</TargetFrameworks>
-		<PackageVersion>1.2.1</PackageVersion>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<EmbedAllSources>True</EmbedAllSources>
 		<LangVersion>latest</LangVersion>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Include="..\..\README.md">
-			<Pack>True</Pack>
-			<PackagePath></PackagePath>
-		</None>
+		<None Include="..\README.md" Pack="true" PackagePath="\" />
+		<None Include="..\LICENSE" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="GitVersion.MsBuild" Version="6.7.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 	</ItemGroup>
 </Project>

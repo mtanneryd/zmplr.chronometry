@@ -1,0 +1,26 @@
+<Project>
+  <!-- Generate AssemblyInfo.cs in intermediate output directory (obj folder) -->
+  <!-- This file is generated during build and does not affect source files or SourceLink -->
+  <Target Name="GenerateVersionAssemblyInfo" BeforeTargets="CoreCompile" Condition="'$(GenerateAssemblyInfo)' == 'false'">
+    <PropertyGroup>
+      <VersionAssemblyInfoFile>$(IntermediateOutputPath)$(MSBuildProjectName).VersionAssemblyInfo.cs</VersionAssemblyInfoFile>
+    </PropertyGroup>
+    
+    <ItemGroup Condition="'$(AssemblyVersion)' != ''">
+      <Compile Include="$(VersionAssemblyInfoFile)" />
+      <VersionAssemblyInfoLines Include="$([MSBuild]::Escape('using System.Reflection;'))" />
+      <VersionAssemblyInfoLines Include="$([MSBuild]::Escape('using System.Runtime.InteropServices;'))" />
+      <VersionAssemblyInfoLines Include="[assembly: AssemblyVersion(&quot;$(AssemblyVersion)&quot;)]" />
+      <VersionAssemblyInfoLines Include="[assembly: AssemblyFileVersion(&quot;$(FileVersion)&quot;)]" Condition="'$(FileVersion)' != ''" />
+      <VersionAssemblyInfoLines Include="[assembly: AssemblyInformationalVersion(&quot;$(InformationalVersion)&quot;)]" Condition="'$(InformationalVersion)' != ''" />
+    </ItemGroup>
+    
+    <WriteLinesToFile
+      Condition="'$(AssemblyVersion)' != ''"
+      File="$(VersionAssemblyInfoFile)"
+      Lines="@(VersionAssemblyInfoLines)"
+      Overwrite="true"
+      WriteOnlyWhenDifferent="true" />
+  </Target>
+</Project>
+
