@@ -6,8 +6,8 @@
 		<Copyright>Tånneryd IT AB</Copyright>
 		<Description>DateTime extensions and other time related helper classes.</Description>
 		<PackageTags>datetime;time;calendar;interval;extensions</PackageTags>
-		<PackageProjectUrl>https://github.com/mtanneryd/zmplr.chronometry</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/mtanneryd/zmplr.chronometry</RepositoryUrl>
+		<PackageProjectUrl>https://mtanneryd.github.io/zmplr/</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/mtanneryd/zmplr-chronometry</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<TargetFrameworks>net8.0;net48;netstandard2.0;netstandard2.1</TargetFrameworks>
